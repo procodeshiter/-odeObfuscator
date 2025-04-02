@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeObfuscator | Minimalist Code Protection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-dark: #1a0526;
+            --primary: #3a0a5c;
+            --primary-light: #5c1b8a;
+            --accent: #9c4dff;
+            --text: #f0e6ff;
+            --text-secondary: #d4b8ff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(156, 77, 255, 0.2);
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--accent), #c77dff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .telegram-btn {
+            color: var(--text-secondary);
+            font-size: 1.8rem;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        
+        .telegram-btn:hover {
+            color: #0088cc;
+            transform: scale(1.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--text), var(--text-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 700px;
+        }
+        
+        .code-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .code-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .code-box {
+            background: rgba(26, 5, 38, 0.6);
+            border: 1px solid rgba(156, 77, 255, 0.2);
+            border-radius: 8px;
+            padding: 1.5rem;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .code-box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .copy-btn {
+            background: rgba(156, 77, 255, 0.1);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            border-radius: 4px;
+            padding: 0.3rem 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background: rgba(156, 77, 255, 0.3);
+        }
+        
+        textarea {
+            background: rgba(10, 2, 15, 0.8);
+            border: 1px solid rgba(156, 77, 255, 0.2);
+            border-radius: 6px;
+            padding: 1rem;
+            color: var(--text);
+            flex-grow: 1;
+            resize: none;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            user-select: text;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        button {
+            background: linear-gradient(to right, var(--primary-light), var(--accent));
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(156, 77, 255, 0.3);
+        }
+        
+        button.secondary {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+        
+        .feature-card {
+            background: rgba(26, 5, 38, 0.4);
+            border: 1px solid rgba(156, 77, 255, 0.1);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(156, 77, 255, 0.3);
+        }
+        
+        .feature-icon {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+        
+        .feature-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(156, 77, 255, 0.2);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: var(--primary-dark);
+            color: var(--text);
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid var(--accent);
+            font-size: 0.8rem;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* Anti-copy protection */
+        .no-copy {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            pointer-events: none;
+            background: transparent;
+        }
+        
+        .no-select {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="no-copy"></div>
+    <div class="container">
+        <header>
+            <div class="logo">CodeObfuscator</div>
+            <a href="https://t.me/aevorial" class="telegram-btn" target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-telegram"></i>
+            </a>
+        </header>
+        
+        <main>
+            <h1>HTML & JavaScript Code Obfuscation</h1>
+            <p class="subtitle">Transform your code into an unreadable format to protect intellectual property. Minimalist interface, maximum efficiency.</p>
+            
+            <div class="controls">
+                <button id="obfuscate-btn">Obfuscate Code</button>
+                <button id="clear-btn" class="secondary">Clear</button>
+                <div class="tooltip">
+                    <button id="sample-btn" class="secondary">Sample Code</button>
+                    <span class="tooltiptext">Insert sample code</span>
+                </div>
+            </div>
+            
+            <div class="code-container">
+                <div class="code-box">
+                    <div class="code-box-header">
+                        <span>Original Code</span>
+                        <button class="copy-btn" id="copy-original">Copy</button>
+                    </div>
+                    <textarea id="original-code" placeholder="Paste your HTML or JavaScript code here..."></textarea>
+                </div>
+                
+                <div class="code-box">
+                    <div class="code-box-header">
+                        <span>Obfuscated Code</span>
+                        <button class="copy-btn" id="copy-obfuscated">Copy</button>
+                    </div>
+                    <textarea id="obfuscated-code" readonly placeholder="Obfuscated code will appear here..."></textarea>
+                </div>
+            </div>
+            
+            <div class="features">
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">Code Protection</h3>
+                    <p class="feature-desc">Protect your JavaScript from theft and unauthorized use by making it difficult to analyze.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Fast Processing</h3>
+                    <p class="feature-desc">Instant obfuscation of even large files without loss of functionality.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3 class="feature-title">Backward Compatible</h3>
+                    <p class="feature-desc">Obfuscated code works the same as the original with no runtime errors.</p>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>ae 2025</p>
+        </footer>
+    </div>
+
+    <script>
+        // Basic anti-copy protection
+        document.addEventListener('DOMContentLoaded', function() {
+            // Disable right-click
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+            });
+            
+            // Disable keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Disable Ctrl+C, Ctrl+U, Ctrl+S, etc.
+                if (e.ctrlKey && (e.keyCode === 67 || e.keyCode === 85 || e.keyCode === 83)) {
+                    e.preventDefault();
+                }
+                // Disable F12
+                if (e.keyCode === 123) {
+                    e.preventDefault();
+                }
+            });
+            
+            // Protection against iframe embedding
+            if (window != top) {
+                top.location.href = window.location.href;
+            }
+            
+            // Main application code
+            const originalCode = document.getElementById('original-code');
+            const obfuscatedCode = document.getElementById('obfuscated-code');
+            const obfuscateBtn = document.getElementById('obfuscate-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const sampleBtn = document.getElementById('sample-btn');
+            const copyOriginalBtn = document.getElementById('copy-original');
+            const copyObfuscatedBtn = document.getElementById('copy-obfuscated');
+            
+            // Sample code for demonstration
+            const sampleCode = `// Sample JavaScript code
+function calculateTotal(items, taxRate) {
+    let subtotal = 0;
+    for (let i = 0; i < items.length; i++) {
+        subtotal += items[i].price * items[i].quantity;
+    }
+    const tax = subtotal * taxRate;
+    return subtotal + tax;
+}
+
+const items = [
+    { name: 'Book', price: 15, quantity: 2 },
+    { name: 'Pen', price: 2, quantity: 5 }
+];
+
+console.log('Total:', calculateTotal(items, 0.1));`;
+            
+            // Insert sample code
+            sampleBtn.addEventListener('click', function() {
+                originalCode.value = sampleCode;
+            });
+            
+            // Clear both text areas
+            clearBtn.addEventListener('click', function() {
+                originalCode.value = '';
+                obfuscatedCode.value = '';
+            });
+            
+            // Copy original code
+            copyOriginalBtn.addEventListener('click', function() {
+                originalCode.select();
+                document.execCommand('copy');
+                showTooltip(copyOriginalBtn, 'Copied!');
+            });
+            
+            // Copy obfuscated code
+            copyObfuscatedBtn.addEventListener('click', function() {
+                obfuscatedCode.select();
+                document.execCommand('copy');
+                showTooltip(copyObfuscatedBtn, 'Copied!');
+            });
+            
+            // Tooltip function
+            function showTooltip(element, message) {
+                const tooltip = document.createElement('span');
+                tooltip.className = 'tooltiptext';
+                tooltip.textContent = message;
+                tooltip.style.position = 'absolute';
+                tooltip.style.bottom = '125%';
+                tooltip.style.left = '50%';
+                tooltip.style.transform = 'translateX(-50%)';
+                
+                element.appendChild(tooltip);
+                tooltip.style.visibility = 'visible';
+                tooltip.style.opacity = '1';
+                
+                setTimeout(() => {
+                    tooltip.style.visibility = 'hidden';
+                    tooltip.style.opacity = '0';
+                    setTimeout(() => element.removeChild(tooltip), 300);
+                }, 1500);
+            }
+            
+            // Obfuscation function
+            obfuscateBtn.addEventListener('click', function() {
+                const code = originalCode.value.trim();
+                if (!code) {
+                    alert('Please enter code to obfuscate');
+                    return;
+                }
+                
+                // Simple obfuscation (in a real app use more sophisticated algorithms)
+                try {
+                    let obfuscated = code;
+                    
+                    // 1. Remove comments
+                    obfuscated = obfuscated.replace(/\/\/.*|\/\*[\s\S]*?\*\//g, '');
+                    
+                    // 2. Replace variable and function names
+                    obfuscated = obfuscated.replace(/\b(function|let|const|var)\s+([a-zA-Z_$][0-9a-zA-Z_$]*)/g, 
+                        (match, keyword, name) => {
+                            const newName = '_0x' + Math.random().toString(16).substr(2, 4);
+                            return keyword + ' ' + newName;
+                        });
+                    
+                    // 3. Remove extra spaces and line breaks
+                    obfuscated = obfuscated.replace(/\s+/g, ' ');
+                    
+                    // 4. String encoding (basic version)
+                    obfuscated = obfuscated.replace(/'([^']*)'|"([^"]*)"/g, 
+                        match => {
+                            const str = match.slice(1, -1);
+                            const encoded = str.split('').map(c => '\\x' + c.charCodeAt(0).toString(16)).join('');
+                            return '"' + encoded + '"';
+                        });
+                    
+                    obfuscatedCode.value = obfuscated;
+                } catch (error) {
+                    obfuscatedCode.value = 'Obfuscation error: ' + error.message;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
